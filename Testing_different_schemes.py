@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions.Space_time_discretization import space_time
 import math
 from Simpson_rule import l2_norm_error_simpson
 
@@ -11,14 +10,8 @@ from Simpson_rule import l2_norm_error_simpson
 def f(X):
     """Asigna un valor de 1.0 para valores menores que 0.1"""
     f = np.zeros_like(X)
-    #○f[np.where(X < 1.4)] = 1.0
-    # if X <= 1.4 :
-    #     f=1
-    # else:
-    #     f=0
+    #f[np.where(X < 1.4)] = 1.0
     f = np.exp(-2*(X-4)**2)
-    #f = np.exp(-200*(X+0.5)**2) + 0.1*np.sin(2*np.pi*(X+0.5))
-    #print(xmax)
     return f
 
 ###############################################
@@ -29,10 +22,6 @@ def f(X):
 def euler_backward(u, c):
     Z1= np.copy(u)
     Z1[1:-1]=np.round( (1 - c) * u[1:-1] + c * u[:-2],15)
-
-    # for i in np.arange(1, np.size(u)-2):
-    #     Z1[i]= (1 - c) * u[i] + c * u[i-1]
-    #     print(i) 
     ### NEULANN BOUNDARY CONDITIONS ###
     Z1[0]=Z1[1]
     Z1[-1]=Z1[-2]
@@ -40,9 +29,6 @@ def euler_backward(u, c):
 
 def Lax_wendroff(u, c):
     Z1= np.copy(u)
-    #Z1[1:-1]= u[1:-1] - 0.5 * c * (u[2:] - u[:-2]) + 0.5 * c**2 * (u[2:] - 2*u[1:-1] + u[:-2])
-    #Z1[1:-1]= u[1:-1] - 0.5 * c * (u[2:] - u[:-2]) + 0.5 * (c) ** 2 * (u[2:] - 2 * u[1:-1] + u[:-2])
-    #Z1[1:-1]=  (1 - c**2)*u[1:-1] + 0.5*c*((c-1)*u[2:] + (c+1)*u[:-2])
     Z1[1:-1]= np.round(0.5*c*(1+c)*u[:-2] + (1-c**2)*u[1:-1] - 0.5*c*(1-c)*u[2:], 15)
     ### NEULANN BOUNDARY CONDITIONS ###
     Z1[0]=Z1[1]
@@ -64,7 +50,7 @@ def Lax_friedrich(u, c):
 a = 1  # wave velocity
 tmin, tmax = 0.0, 1.   #3.125e-05  # initial and final time
 xmin, xmax = 0.0, 100.0  # 1D domain
-c = .3 #0.2# Courant number, we need c<=1 for stability
+c = .1 #0.2# Courant number, we need c<=1 for stability
 
 
 Nx_values = np.array([2**k for k in range(5, 15)])   # Different spatial resolutions
@@ -84,7 +70,6 @@ x_vectors=[]
 MSE_error=[]
 for Nx in Nx_values:
     # Discretisaiton of time and space
-    #x, dx, dt, Nt, time = space_time(c=c, a=a, xmin=xmin, xmax=xmax, Nx=Nx, tmin=tmin, tmax=tmax)
     x = np.linspace(xmin, xmax, Nx + 1) # discretization of space
     dx = float((xmax-xmin)/Nx) # spatial step size
     dt = c/a*dx # stable time step calculated from stability requirement
@@ -101,27 +86,14 @@ for Nx in Nx_values:
     u_lw= u_initial.copy()
     u_lf= u_initial.copy()
     
-    error=0
-    samplePoints=0
+
 
     #for i, t in enumerate(time[1:]): # np.arange(Nt+1): 
     for _ in range(Nt):
         u_euler_backward = euler_backward(u_euler_backward, c)
         u_lw = Lax_wendroff(u_lw, c)
         u_lf = Lax_friedrich(u_lf, c)
-        #error += np.sum((u_lw - f(x-a*t))**2) # add error from this timestep
-        #samplePoints += len(u_lw)
 
-        """
-        Boundary conditions
-        """
-        #u_lw[0]= np.exp(-200*(x[0]+0.5)**2) + 0.1*np.sin(2*np.pi*(x[0]+0.5))
-        #u_lw[-1]= np.exp(-200*(x[-1]+0.5)**2) + 0.1*np.sin(2*np.pi*(x[-1]+0.5))
-        
-
-
-    #○error = np.sqrt(error/samplePoints) # calculate rms-error
-    #MSE_error.append(error)   
         
     
     euler_solutions.append(u_euler_backward)
@@ -129,8 +101,6 @@ for Nx in Nx_values:
     lf_solutions.append(u_lf)
         
     # Calculate de real solution
-    #real_sol= np.sin(2 * np.pi * (x - a*tmax) )
-    #real_sol= np.exp(-2*(x-4-a*tmax)**2)
     real_sol= f(x-a*tmax)
     
     # Calculate the error with respect to the initial condition
@@ -200,21 +170,6 @@ plt.grid(True)
 plt.show()
 
 
-
-
-# # Plotting the MSE ERROR
-# fig = plt.figure()
-# ax = fig.add_subplot(1, 1, 1)
-# plt.plot(dx_values[:-1], ERRORS[:-1], marker='o', label='lax WENDROFF')
-# plt.yscale('log')
-# plt.xlabel('dx')
-# plt.ylabel('Error')
-# plt.title('MSE ERROR')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
-
-
 def slope(x):
     return  2*x
 
@@ -245,23 +200,6 @@ print("slope L-W in space", slope_lw)
 
 
 
-# # Plotting the order of convergence
-# fig = plt.figure()
-# ax = fig.add_subplot(1, 1, 1)
-# plt.plot(dt_values[:-1], errors_euler_backward[:-1], marker='o', label='FTBS')
-# plt.plot(dt_values[:-1], errors_lax_wendroff[:-1], marker='o', label='Lax Wendroff')
-# #plt.plot(dt_values[:-1], errors_lax_friedrich[:-1], marker='o', label='Lax Friedrich')
-
-
-# plt.xscale('log')
-# plt.yscale('log')
-# plt.xlabel('dt')
-# plt.ylabel('Error')
-# plt.title('Order of Convergence for Different Schemes for TIME')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
-
 slope_euler = (np.log(errors_euler_backward[-1])-np.log(errors_euler_backward[-2]))/(np.log(dt_values[-1])-np.log(dt_values[-2]))
 print("slope FTBS in time", slope_euler)
 #slope_lw = (np.log(errors_lax_wendroff[-1])-np.log(errors_lax_wendroff[-2]))/(np.log(dt_values[-1])-np.log(dt_values[-2]))
@@ -277,9 +215,6 @@ plt.plot(x_vectors[0],  euler_solutions[0], marker='o', label='FTBS scheme')
 #plt.plot(x_vectors[0],  lw_solutions[0], marker='o', label='Lax-Wendroff scheme')
 #plt.plot(x_vectors[0],  lf_solutions[0], marker='o', label='Lax-Friedrich scheme')
 
-# plt.plot(dx_values[:-1], errors_lax_wendroff[:-1], marker='o', label='Lax Wendroff')
-# plt.plot(dx_values[:-1], errors_lax_friedrich[:-1], marker='o', label='Lax Friedrich')
-
 plt.xlabel('x')
 plt.ylabel('Error')
 plt.title('Order of Convergence for Different Schemes for SPACE')
@@ -287,21 +222,4 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-
-# plt.figure(figsize=(10, 6))
-# #plt.plot(x_vectors[2],  np.exp(-2*(x_vectors[2]-4-a*tmax)**2), marker='o', label='FTBS exact')
-# plt.plot(x_vectors[2], f(x_vectors[2]-a*tmax)  , marker='o', label='FTBS exact')
-# plt.plot(x_vectors[2],  euler_solutions[2], marker='o', label='FTBS scheme')
-# plt.plot(x_vectors[2],  lw_solutions[2], marker='o', label='Lax-Wendroff scheme')
-
-
-# # plt.plot(dx_values[:-1], errors_lax_wendroff[:-1], marker='o', label='Lax Wendroff')
-# # plt.plot(dx_values[:-1], errors_lax_friedrich[:-1], marker='o', label='Lax Friedrich')
-
-# plt.xlabel('dx')
-# plt.ylabel('Error')
-# plt.title('Order of Convergence for Different Schemes for SPACE')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
 
