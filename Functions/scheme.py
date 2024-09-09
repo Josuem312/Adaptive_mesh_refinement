@@ -5,8 +5,6 @@ Created on Thu Jul 18 12:00:01 2024
 @author: josue
 """
 import numpy as np
-from Functions.Tree import Node
-from Functions.Initial_conditions import init
 """
 In this function we apply the differen finite difference schemes###
 The parameters are the type of scheme, the vector of previous solution u and
@@ -46,13 +44,6 @@ def scheme(type_of_scheme, node, c, ratio_ref,
         # FORWARD TIME BACKWARD SPACE
             #Formula of Q
             Z1[1:-1]= np.round((1 - c) * u[1:-1] + c * u[:-2],15)
-            #BOUNDARY CONDITIONS
-            # if node.level>0:        
-            # # else:
-            # Z1[0]= f(type_initial_condition, node.x_value[0]- node.time)
-            # Z1[-1]= f(type_initial_condition, node.x_value[-1]- node.time)
-            # # Z1[0]=u[1]
-            # # Z1[-1]=u[-2]
             
             """
             Boundary conditions
@@ -79,8 +70,6 @@ def scheme(type_of_scheme, node, c, ratio_ref,
             Z2[1:-1]= (1 - c) * Z1[1:-1] + c * Z1[:-2]
             Z2[1]=0
             Z2[-2]=0
-            #A better way to calculate Q^2
-            #Z2[2:-2]=(1 - c) * Z1[2:-2] + c * Z1[1:-3]
             
             # Formula of Q_2h
             Z3[2:-2]= (1 - c) * u[2:-2] + c * u[:-4]
@@ -93,8 +82,6 @@ def scheme(type_of_scheme, node, c, ratio_ref,
             #Formula of Q
             Z1[1:-1]= np.round(u[1:-1] - 0.5 * c * (u[2:] - u[:-2]) + 0.5 * c**2 * (u[2:] - 2*u[1:-1] + u[:-2]),15)
             
-            #Z1[0]=f(type_initial_condition, node.x_value[0] - node.time) ## We suppose that a=1 and xmax=4
-            #Z1[-1]=f(type_initial_condition, node.x_value[-1] - node.time) 
             """
             Boundary conditions
             """
@@ -155,17 +142,3 @@ def scheme_using_node(node, c, type_of_scheme):
     return Q1, Q_power_2, Q_2h, order, stencil  
 
     
-
-# print(x[0:])
-
-
-
-# """ 
-# SOME COMMENTS
-# """
-### Fourth STEPPING #####  
-        #u= U0 # Important change (before was np.copy)
-        ## Some settings for the boundary condition N2##
-        #u_bc = interpolate.interp1d(x[-2:], U0[-2:])
-        #u_bc_2 = interpolate.interp1d(x[:2], U0[:2], fill_value="extrapolate")
-

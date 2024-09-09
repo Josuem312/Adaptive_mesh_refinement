@@ -25,11 +25,3 @@ def init(type_initial_condition, x):
         y = 50 * (0.01 - (x - 0.3)**2) * np.exp(0.01 / ((x - 0.3)**2 - 0.01))
         y[np.where((x > 1.4) | (x < 1.2))] = 0.0
     return y
-
-
-# x = np.array([0., 0.3, 0.5])
-# y= np.zeros_like(x)
-# tv=  (x < 0.4) & (x > 0.2)
-
-
-# print(tv)

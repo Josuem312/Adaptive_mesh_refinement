@@ -23,9 +23,6 @@ from Functions.Auxiliary_functions import compare_vectors_with_indices
 def updating_new_node(node):
     new_vector= np.copy(node.value)
     matches= compare_vectors_with_indices(node.x_value, node.children[0].x_value)
-    #print("subgrid:", subgrid)
-    #print("grid", grid )
-    #print("matches:", matches)
     for obj in matches:
         new_vector[obj[1]]=node.children[0].value[obj[2]]
     return new_vector    

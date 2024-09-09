@@ -25,8 +25,6 @@ def AMR_cas_1(  ratio_ref, c,
         power=1
    
     for i in np.arange(ratio_ref**power):
-        #print (f"subiter: {i+1} ")
-        #print (f"time= {node.time}")
 ### First, we calcule the needed vector for calculating the error estimator    
         Z1, Z2, Z3, order, stencil = scheme(type_of_scheme, node, c, 
                                         ratio_ref, type_initial_condition)

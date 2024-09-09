@@ -4,14 +4,8 @@ Created on Thu Jul 18 13:44:44 2024
 
 @author: josue
 """
-import numpy as np
-from Functions.Flagging import flagging_with_subgriddings
-from Functions.Interpolation import u_finer_init_new
-from Functions.Interpolation import u_finer_init_new_node
 from Functions.Interpolation import u_finer_init_new_node_version_2
-from Functions.Interpolation import u_finer_init_new_node_version_2_2
 from Functions.Initial_conditions import init
-from Functions.Auxiliary_functions import compare_vectors_with_indices
 from Functions.Tree import Node
 
 """
@@ -46,12 +40,7 @@ def subgridding_process(node, flag, stencil, ratio_ref,
 #Creation of the subgrid
         subgrid=new_finer_subgrid_node(node, flag, stencil, ratio_ref)
         
-#Initialization of the new vector solution
-        # if node.time==0:
-        #     u_finer_initial= initial_conditions(type_initial_condition, subgrid)
-        # else:
-        #     u_finer_initial, l= u_finer_init_new_node_version_2(node, subgrid, flag, ratio_ref, stencil)
-        
+#Initialization of the new vector solution      
         u_finer_initial, l= u_finer_init_new_node_version_2(node, subgrid, flag, ratio_ref, stencil)
         if node.time==0:
             u_finer_initial= init(type_initial_condition, subgrid)
